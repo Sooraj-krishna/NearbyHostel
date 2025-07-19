@@ -15,7 +15,7 @@ const LoadingScreen = () => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
-      <h1 className="text-black text-7xl font-bold">Project Archive</h1>
+      <h1 className="text-black text-7xl font-bold">Nearby Hostels</h1>
     </div>
   );
 };

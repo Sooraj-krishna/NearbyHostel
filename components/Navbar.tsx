@@ -33,7 +33,7 @@ const Navbar = () => {
       <div className="max-w-screen-xl flex items-center justify-between mx-auto py-5">
         {/* Logo Section */}
         <div className="flex flex-row font-poppins font-bold text-[26px] z-10 items-center relative text-black">
-          Project Archive
+          Nearby Hostels
         </div>
 
         {/* Authentication Button */}
