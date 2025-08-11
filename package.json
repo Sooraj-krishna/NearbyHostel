@@ -10,7 +10,10 @@
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:push": "drizzle-kit push",
     "drizzle:studio": "drizzle-kit studio",
-    "drizzle:migrate": "drizzle-kit migrate"
+    "drizzle:migrate": "drizzle-kit migrate",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:deploy": "npx wrangler pages deploy .vercel/output/static",
+    "pages:dev": "npx @cloudflare/next-on-pages --dev"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -43,6 +46,7 @@
     "tsx": "^4.20.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.8.5",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20.17.19",
     "@types/pg": "^8.15.4",

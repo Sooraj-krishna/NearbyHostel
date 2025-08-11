@@ -1,0 +1,37 @@
+name = "nearby-hostels"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "nearby-hostels"
+
+[env.staging]
+name = "nearby-hostels-staging"
+
+[build]
+command = "npm run pages:build"
+
+[build.upload]
+format = "service-worker"
+
+[[env.production.vars]]
+DATABASE_URL = "your_production_database_url"
+FIREBASE_ADMIN_SDK_KEY = "your_firebase_admin_sdk_key"
+NEXT_PUBLIC_FIREBASE_API_KEY = "your_firebase_api_key"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "your_firebase_auth_domain"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID = "your_firebase_project_id"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = "your_firebase_storage_bucket"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "your_firebase_messaging_sender_id"
+NEXT_PUBLIC_FIREBASE_APP_ID = "your_firebase_app_id"
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = "your_firebase_measurement_id"
+
+[[env.staging.vars]]
+DATABASE_URL = "your_staging_database_url"
+FIREBASE_ADMIN_SDK_KEY = "your_firebase_admin_sdk_key"
+NEXT_PUBLIC_FIREBASE_API_KEY = "your_firebase_api_key"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "your_firebase_auth_domain"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID = "your_firebase_project_id"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = "your_firebase_storage_bucket"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "your_firebase_messaging_sender_id"
+NEXT_PUBLIC_FIREBASE_APP_ID = "your_firebase_app_id"
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = "your_firebase_measurement_id" 
