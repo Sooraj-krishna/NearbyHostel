@@ -7,84 +7,98 @@ import * as schema from '../lib/schema';
 
 config({ path: '.env.local' });
 
-// neonConfig.fetchQuotedChars = true;
-
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
 
 async function main() {
   try {
-    console.log('Seeding started...');
+    console.log('🌱 Starting hostel seed...');
 
     // Clear existing data (optional, for a clean slate)
-    await db.delete(schema.projectOptions);
-    await db.delete(schema.teamMembers);
-    await db.delete(schema.projects);
+    await db.delete(schema.hostelOptions);
+    await db.delete(schema.hostelImages);
+    await db.delete(schema.ratings);
+    await db.delete(schema.comments);
+    await db.delete(schema.hostels);
     await db.delete(schema.categoryOptionValues);
     await db.delete(schema.categories);
+    await db.delete(schema.users);
+
+    console.log('🗑️  Cleared existing data');
+
+    // Seed Users (for testing purposes)
+    const [testUser] = await db.insert(schema.users).values({
+      userRole: 'admin',
+      firebaseUid: 'test-admin-uid',
+      displayName: 'Test Admin'
+    }).returning();
+
+    console.log('👤 Created test user');
 
     // Seed Categories
-    const [projectTypeCat] = await db.insert(schema.categories).values({ category: 'Project Type' }).returning();
-    const [departmentCat] = await db.insert(schema.categories).values({ category: 'Department' }).returning();
-    const [domainCat] = await db.insert(schema.categories).values({ category: 'Domain' }).returning();
-    const [yearOfSubmissionCat] = await db.insert(schema.categories).values({ category: 'Year of Submission' }).returning();
-    const [semesterCat] = await db.insert(schema.categories).values({ category: 'Semester' }).returning();
+    const [amenitiesCat] = await db.insert(schema.categories).values({ category: 'Amenities' }).returning();
+    const [roomTypeCat] = await db.insert(schema.categories).values({ category: 'Room Type' }).returning();
+    const [locationTypeCat] = await db.insert(schema.categories).values({ category: 'Location Type' }).returning();
+    const [priceRangeCat] = await db.insert(schema.categories).values({ category: 'Price Range' }).returning();
+    const [atmosphereCat] = await db.insert(schema.categories).values({ category: 'Atmosphere' }).returning();
+
+    console.log('📂 Created categories');
 
     // Seed Category Options
-    const projectTypeOptions = [
-      { categoryId: projectTypeCat.categoryId, optionName: 'Personal Project' },
-      { categoryId: projectTypeCat.categoryId, optionName: 'Mini Project' },
-      { categoryId: projectTypeCat.categoryId, optionName: 'Final Year Project' },
-      { categoryId: projectTypeCat.categoryId, optionName: 'Product' },
-      { categoryId: projectTypeCat.categoryId, optionName: 'Research Paper' },
-      { categoryId: projectTypeCat.categoryId, optionName: 'Others' },
+    const amenityOptions = [
+      { categoryId: amenitiesCat.categoryId, optionName: 'Free WiFi' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Kitchen' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Laundry' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Garden/Terrace' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'BBQ Area' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Tour Desk' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Bike Rental' },
+      { categoryId: amenitiesCat.categoryId, optionName: 'Luggage Storage' },
     ];
 
-    const departmentOptions = [
-      { categoryId: departmentCat.categoryId, optionName: 'CSE' },
-      { categoryId: departmentCat.categoryId, optionName: 'ECE' },
-      { categoryId: departmentCat.categoryId, optionName: 'EEE' },
-      { categoryId: departmentCat.categoryId, optionName: 'ME' },
-      { categoryId: departmentCat.categoryId, optionName: 'CE' },
-      { categoryId: departmentCat.categoryId, optionName: 'AEI' },
-      { categoryId: departmentCat.categoryId, optionName: 'Other' },
+    const roomTypeOptions = [
+      { categoryId: roomTypeCat.categoryId, optionName: 'Dormitory' },
+      { categoryId: roomTypeCat.categoryId, optionName: 'Private Room' },
+      { categoryId: roomTypeCat.categoryId, optionName: 'Mixed Dorm' },
+      { categoryId: roomTypeCat.categoryId, optionName: 'Double Room' },
+      { categoryId: roomTypeCat.categoryId, optionName: 'Female Only Dorm' },
+      { categoryId: roomTypeCat.categoryId, optionName: 'Male Only Dorm' },
     ];
 
-    const domainOptions = [
-      { categoryId: domainCat.categoryId, optionName: 'Web Development' },
-      { categoryId: domainCat.categoryId, optionName: 'App Development' },
-      { categoryId: domainCat.categoryId, optionName: 'Machine Learning' },
-      { categoryId: domainCat.categoryId, optionName: 'Artificial Intelligence' },
-      { categoryId: domainCat.categoryId, optionName: 'Cyber Security' },
-      { categoryId: domainCat.categoryId, optionName: 'Data Science' },
-      { categoryId: domainCat.categoryId, optionName: 'Cloud Computing' },
-      { categoryId: domainCat.categoryId, optionName: 'Blockchain' },
-      { categoryId: domainCat.categoryId, optionName: 'Game Development' },
-      { categoryId: domainCat.categoryId, optionName: 'IoT' },
-      { categoryId: domainCat.categoryId, optionName: 'Robotics' },
-      { categoryId: domainCat.categoryId, optionName: 'Other' },
+    const locationTypeOptions = [
+      { categoryId: locationTypeCat.categoryId, optionName: 'City Center' },
+      { categoryId: locationTypeCat.categoryId, optionName: 'Mountain View' },
+      { categoryId: locationTypeCat.categoryId, optionName: 'Beachfront' },
+      { categoryId: locationTypeCat.categoryId, optionName: 'Business District' },
+      { categoryId: locationTypeCat.categoryId, optionName: 'Historic District' },
+      { categoryId: locationTypeCat.categoryId, optionName: 'Airport Area' },
     ];
 
-    const yearOfSubmissionOptions = [
-      { categoryId: yearOfSubmissionCat.categoryId, optionName: '2023' },
-      { categoryId: yearOfSubmissionCat.categoryId, optionName: '2024' },
-      { categoryId: yearOfSubmissionCat.categoryId, optionName: '2025' },
-      { categoryId: yearOfSubmissionCat.categoryId, optionName: '2026' },
+    const priceRangeOptions = [
+      { categoryId: priceRangeCat.categoryId, optionName: 'Economy ($25-50)' },
+      { categoryId: priceRangeCat.categoryId, optionName: 'Mid-range ($50-100)' },
+      { categoryId: priceRangeCat.categoryId, optionName: 'Premium ($100-200)' },
+      { categoryId: priceRangeCat.categoryId, optionName: 'Luxury ($200+)' },
     ];
 
-    const semesterOptions = [
-      { categoryId: semesterCat.categoryId, optionName: 'S1' },
-      { categoryId: semesterCat.categoryId, optionName: 'S2' },
-      { categoryId: semesterCat.categoryId, optionName: 'S3' },
-      { categoryId: semesterCat.categoryId, optionName: 'S4' },
-      { categoryId: semesterCat.categoryId, optionName: 'S5' },
-      { categoryId: semesterCat.categoryId, optionName: 'S6' },
-      { categoryId: semesterCat.categoryId, optionName: 'S7' },
-      { categoryId: semesterCat.categoryId, optionName: 'S8' },
+    const atmosphereOptions = [
+      { categoryId: atmosphereCat.categoryId, optionName: 'Party/Social' },
+      { categoryId: atmosphereCat.categoryId, optionName: 'Quiet/Relaxed' },
+      { categoryId: atmosphereCat.categoryId, optionName: 'Backpacker' },
+      { categoryId: atmosphereCat.categoryId, optionName: 'Digital Nomad' },
+      { categoryId: atmosphereCat.categoryId, optionName: 'Traditional' },
+      { categoryId: atmosphereCat.categoryId, optionName: 'Family Friendly' },
     ];
 
-    await db.insert(schema.categoryOptionValues).values([...projectTypeOptions, ...departmentOptions, ...domainOptions, ...yearOfSubmissionOptions, ...semesterOptions]);
-    console.log('Categories and Options seeded.');
+    await db.insert(schema.categoryOptionValues).values([
+      ...amenityOptions, 
+      ...roomTypeOptions, 
+      ...locationTypeOptions, 
+      ...priceRangeOptions, 
+      ...atmosphereOptions
+    ]);
+
+    console.log('🏷️  Created category options');
 
     // Helper function to get option ID by category name and option name
     async function getOptionId(categoryName: string, optionName: string): Promise<number | undefined> {
@@ -102,165 +116,118 @@ async function main() {
       return option?.optionId;
     }
 
-    // Seed Projects
-    const projectsData = [
+    // Seed Sample Hostels
+    const hostelsData = [
       {
-        projectName: 'Repeto ',
-        projectDescription: 'A platform where you can prevoious hackathon internship that repeat all year from top companys',
-        projectLink: 'https://github.com/example/chatbot',
-        createdAt: new Date('2025-01-15T00:00:00.000Z'),
-        customDomain: null,
-        members: [
-          { name: 'Shadil A M', linkedin: 'https://www.linkedin.com/in/shadilam/' },
-          { name: 'Sooraj Krishna K P', linkedin: 'https://www.linkedin.com/in/sooraj-krishna-k-p/' },
-          { name: 'Abhijith S', linkedin: 'https://www.linkedin.com/in/abhijiths-s/' },
-          { name: 'Abhiram P S', linkedin: 'https://www.linkedin.com/in/abhiram-ps-9b744924b/' },
-        ],
+        hostelName: "Backpacker's Paradise",
+        hostelDescription: "A vibrant hostel in the heart of the city, perfect for budget travelers looking to meet fellow adventurers. Features a lively common room, free breakfast, and organized tours.",
+        location: "https://maps.google.com/?q=123+Main+St+City+Center",
+        address: "123 Main Street, City Center, 12345",
+        phoneNumber: "+1 555 123 4567",
+        email: "info@backpackersparadise.com",
+        website: "https://www.backpackersparadise.com",
+        priceRange: "$25-50",
         categories: [
-          { categoryName: 'Project Type', optionName: 'Personal Project' },
-          { categoryName: 'Department', optionName: 'CSE' },
-          { categoryName: 'Year of Submission', optionName: '2025' },
-          { categoryName: 'Domain', optionName: 'Web Development' }
+          { categoryName: 'Amenities', optionName: 'Free WiFi' },
+          { categoryName: 'Room Type', optionName: 'Dormitory' },
+          { categoryName: 'Location Type', optionName: 'City Center' },
+          { categoryName: 'Price Range', optionName: 'Economy ($25-50)' },
+          { categoryName: 'Atmosphere', optionName: 'Party/Social' }
         ]
       },
       {
-        projectName: 'Nemini Electric website',
-        projectDescription: 'Made a website for my friend fathers bussincess',
-        projectLink: 'https://github.com/shadil-rayyan/nenmini-electric_website',
-        createdAt: new Date('2024-06-10T00:00:00.000Z'),
-        customDomain: null,
-        members: [
-          { name: 'Shadil A M', linkedin: 'https://www.linkedin.com/in/shadilam/' },
-        ],
+        hostelName: "Mountain View Lodge",
+        hostelDescription: "Peaceful hostel with stunning mountain views. Perfect for nature lovers and those seeking a quiet retreat. Features hiking trails, garden, and cozy common areas.",
+        location: "https://maps.google.com/?q=456+Mountain+Rd+Scenic+View",
+        address: "456 Mountain Road, Scenic View, 67890",
+        phoneNumber: "+1 555 987 6543",
+        email: "hello@mountainviewlodge.com",
+        website: "https://www.mountainviewlodge.com",
+        priceRange: "$50-100",
         categories: [
-          { categoryName: 'Project Type', optionName: 'Personal Project' },
-          { categoryName: 'Department', optionName: 'CSE' },
-          { categoryName: 'Year of Submission', optionName: '2024' },
-          { categoryName: 'Domain', optionName: 'Web Development' }
+          { categoryName: 'Amenities', optionName: 'Garden/Terrace' },
+          { categoryName: 'Room Type', optionName: 'Private Room' },
+          { categoryName: 'Location Type', optionName: 'Mountain View' },
+          { categoryName: 'Price Range', optionName: 'Mid-range ($50-100)' },
+          { categoryName: 'Atmosphere', optionName: 'Quiet/Relaxed' }
         ]
       },
       {
-        projectName: 'Laptop Price Prediction',
-        projectDescription: 'Implemented a machine learning model to predict laptop prices based on specifications, following a YouTube tutorial to enhance my ML skills.',
-        projectLink: 'https://github.com/shadil-rayyan/My_Projects/tree/main/MachineLearning/LaptopPricePredicator%20-clone',
-        createdAt: new Date('2023-09-22T00:00:00.000Z'),
-        customDomain: null,
-        members: [
-          { name: 'Shadil A M', linkedin: 'https://www.linkedin.com/in/shadilam/' },
-        ],
+        hostelName: "Beachside Bunkhouse",
+        hostelDescription: "Steps away from the beach, this hostel offers the perfect blend of beach life and social atmosphere. Features beach access, surfboard rentals, and beachfront BBQ area.",
+        location: "https://maps.google.com/?q=789+Beach+Ave+Coastal+Town",
+        address: "789 Beach Avenue, Coastal Town, 11111",
+        phoneNumber: "+1 555 456 7890",
+        email: "stay@beachsidebunkhouse.com",
+        website: "https://www.beachsidebunkhouse.com",
+        priceRange: "$30-60",
         categories: [
-          { categoryName: 'Project Type', optionName: 'Personal Project' },
-          { categoryName: 'Department', optionName: 'CSE' },
-          { categoryName: 'Year of Submission', optionName: '2023' },
-          { categoryName: 'Domain', optionName: 'Machine Learning' }
-        ]
-      },
-      {
-        projectName: 'Kerala Tourist Spot',
-        projectDescription: 'Developed a Telegram bot to guide users to authentic dishes and restaurants in Kozhikode city, enhancing culinary exploration for locals and tourists alike.\n',
-        projectLink: 'https://github.com/shadil-rayyan/kerala_tourist_spot-bot.git',
-        createdAt: new Date('2025-03-27T20:34:40.196Z'),
-        customDomain: null,
-        members: [
-          { name: 'Shadil A M', linkedin: 'https://www.linkedin.com/in/shadilam/' },
-        ],
-        categories: [
-          { categoryName: 'Project Type', optionName: 'Personal Project' },
-          { categoryName: 'Department', optionName: 'Other' },
-          { categoryName: 'Year of Submission', optionName: '2025' },
-          { categoryName: 'Domain', optionName: 'App Development' }
-        ]
-      },
-      {
-        projectName: 'sooraj',
-        projectDescription: 'ds,',
-        projectLink: 'https://github.com/Sooraj-krishna/GEC-HUB.git',
-        createdAt: new Date('2025-06-14T09:58:05.487Z'),
-        customDomain: null,
-        members: [
-          { name: 'aSD', linkedin: 'https://github.com/Sooraj-krishna/GEC-HUB.git' },
-          { name: 'Aget', linkedin: 'https://github.com/Sooraj-krishna/GEC-HUB.git' },
-        ],
-        categories: [
-          { categoryName: 'Project Type', optionName: 'Mini Project' },
-          { categoryName: 'Department', optionName: 'Other' },
-          { categoryName: 'Semester', optionName: 'S7' },
-          { categoryName: 'Year of Submission', optionName: '2025' }
-        ]
-      },
-      {
-        projectName: 'n v ',
-        projectDescription: ' jhm',
-        projectLink: 'https://github.com/Sooraj-krishna/GEC-HUB.git',
-        createdAt: new Date('2025-06-14T10:08:46.069Z'),
-        customDomain: null,
-        members: [
-          { name: 'nvb', linkedin: 'https://github.com/Sooraj-krishna/GEC-HUB.git' },
-        ],
-        categories: [
-          { categoryName: 'Project Type', optionName: 'Final Year Project' },
-          { categoryName: 'Department', optionName: 'CSE' },
-          { categoryName: 'Semester', optionName: 'S1' },
-          { categoryName: 'Year of Submission', optionName: '2025' }
-        ]
-      },
-      {
-        projectName: 'hvj',
-        projectDescription: 'yhj',
-        projectLink: 'https://github.com/Sooraj-krishna/GEC-HUB.git',
-        createdAt: new Date('2025-06-14T10:11:56.776Z'),
-        customDomain: null,
-        members: [
-          { name: 'hgfu', linkedin: 'https://github.com/Sooraj-krishna/GEC-HUB.git' },
-        ],
-        categories: [
-          { categoryName: 'Project Type', optionName: 'Mini Project' },
-          { categoryName: 'Department', optionName: 'CSE' },
-          { categoryName: 'Semester', optionName: 'S3' },
-          { categoryName: 'Year of Submission', optionName: '2025' }
+          { categoryName: 'Amenities', optionName: 'BBQ Area' },
+          { categoryName: 'Room Type', optionName: 'Mixed Dorm' },
+          { categoryName: 'Location Type', optionName: 'Beachfront' },
+          { categoryName: 'Price Range', optionName: 'Economy ($25-50)' },
+          { categoryName: 'Atmosphere', optionName: 'Backpacker' }
         ]
       }
     ];
 
-    for (const projectData of projectsData) {
-      const [newProject] = await db.insert(schema.projects).values({
-        projectName: projectData.projectName,
-        projectDescription: projectData.projectDescription,
-        projectLink: projectData.projectLink,
-        createdAt: projectData.createdAt,
-        customDomain: projectData.customDomain,
+    for (const hostelData of hostelsData) {
+      // Insert hostel
+      const [newHostel] = await db.insert(schema.hostels).values({
+        hostelName: hostelData.hostelName,
+        hostelDescription: hostelData.hostelDescription,
+        location: hostelData.location,
+        address: hostelData.address,
+        phoneNumber: hostelData.phoneNumber,
+        email: hostelData.email,
+        website: hostelData.website,
+        priceRange: hostelData.priceRange,
+        createdByUid: testUser.uid,
+        isActive: true,
       }).returning();
 
-      if (newProject && newProject.projectId) {
-        for (const member of projectData.members) {
-          await db.insert(schema.teamMembers).values({
-            projectId: newProject.projectId,
-            name: member.name,
-            linkedin: member.linkedin,
-          });
-        }
+      if (newHostel && newHostel.hostelId) {
+        console.log(`🏨 Created hostel: ${hostelData.hostelName}`);
 
-        for (const category of projectData.categories) {
+        // Link hostel to categories and options
+        for (const category of hostelData.categories) {
           const optionId = await getOptionId(category.categoryName, category.optionName);
           if (optionId) {
             const cat = await db.query.categories.findFirst({
               where: eq(schema.categories.category, category.categoryName)
             });
             if (cat) {
-              await db.insert(schema.projectOptions).values({
-                projectId: newProject.projectId,
+              await db.insert(schema.hostelOptions).values({
+                hostelId: newHostel.hostelId,
                 categoryId: cat.categoryId,
                 optionId: optionId,
               });
             }
           }
         }
+
+        // Add some sample ratings
+        await db.insert(schema.ratings).values({
+          hostelId: newHostel.hostelId,
+          userId: testUser.uid,
+          overallRating: "4.5",
+        });
+
+        // Add some sample comments
+        await db.insert(schema.comments).values({
+          hostelId: newHostel.hostelId,
+          userId: testUser.uid,
+          commentText: `Great experience at ${hostelData.hostelName}! Highly recommended.`,
+          userName: 'Test User',
+          userEmail: 'test@example.com',
+          isVerified: true,
+        });
       }
     }
 
-    console.log('Seeding complete.');
+    console.log('✅ Hostel seeding complete!');
   } catch (error) {
-    console.error('Seeding failed:', error);
+    console.error('❌ Seeding failed:', error);
     process.exit(1);
   }
 }
