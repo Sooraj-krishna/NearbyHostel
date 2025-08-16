@@ -10,7 +10,8 @@
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:push": "drizzle-kit push",
     "drizzle:studio": "drizzle-kit studio",
-    "drizzle:migrate": "drizzle-kit migrate"
+    "drizzle:migrate": "drizzle-kit migrate",
+    "drizzle:seed": "tsx drizzle/seed.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
